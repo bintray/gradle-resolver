@@ -1,0 +1,28 @@
+group = 'com.jfrog.bintray'
+version = '0.0.1-SNAPSHOT'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+repositories {
+    jcenter()
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
+}
+
+task wrapper(type: Wrapper, description: 'Gradle Wrapper task') {
+    gradleVersion = '1.8'
+}
