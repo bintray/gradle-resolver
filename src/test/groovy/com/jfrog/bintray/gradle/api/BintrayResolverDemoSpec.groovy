@@ -17,56 +17,50 @@ class BintrayResolverDemoSpec extends Specification {
         when:
         Collection<GradlePlugin> resolvedPlugins = resolver.plugins()
 
+
         then:
-        resolvedPlugins.first().with {
-            id == 'SingalongBlog'
-            version == '1.0'
-        }
+        def plugin = resolvedPlugins.first()
+        plugin.id == 'SingalongBlog'
+        plugin.version == '1.0'
     }
 
-    def 'Resolve all packages associated with a Gradle plugin'() {
+    def 'Resolve the package that is associated with a Gradle plugin'() {
         setup:
         BintrayResolver resolver = new SimpleBintrayResolver()
         GradlePlugin singalongBlogPlugin = new SimpleGradlePlugin()
 
         when:
-        Collection<BintrayPackage> resolvedPackages = resolver.packages(singalongBlogPlugin)
+        BintrayPackage resolvedPackage = resolver.pkg(singalongBlogPlugin)
 
         then:
-        resolvedPackages.first().with {
-            name == 'captain-hammer'
-            uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer'
-        }
+        resolvedPackage.name == 'captain-hammer'
+        resolvedPackage.uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer'
     }
 
-    def 'Resolve all versions belonging to a Bintray package'() {
+    def 'Resolve all versions belonging to a Gradle plugin'() {
         setup:
         BintrayResolver resolver = new SimpleBintrayResolver()
-        BintrayPackage captainHammersPackage = new SimpleBintrayPackage()
 
         when:
-        Collection<BintrayVersion> resolvedVersions = resolver.versions(captainHammersPackage)
+        Collection<BintrayVersion> resolvedVersions = resolver.versions('SingalongBlog')
+
 
         then:
-        resolvedVersions.first().with {
-            name == '1.0'
-            uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer/1.0'
-        }
+        def version = resolvedVersions.first()
+        version.name == '1.0'
+        version.uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer/1.0'
     }
 
-    def 'Resolve the latest version of a Bintray package'() {
+    def 'Resolve the latest version of a Gradle plugin'() {
         setup:
         BintrayResolver resolver = new SimpleBintrayResolver()
-        BintrayPackage captainHammersPackage = new SimpleBintrayPackage()
 
         when:
-        BintrayVersion latestVersion = resolver.latestVersion(captainHammersPackage)
+        BintrayVersion latestVersion = resolver.latestVersion('SingalongBlog')
 
         then:
-        latestVersion.with {
-            name == '1.0'
-            uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer/1.0'
-        }
+        latestVersion.name == '1.0'
+        latestVersion.uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer/1.0'
     }
 }
 
@@ -78,17 +72,17 @@ private class SimpleBintrayResolver implements BintrayResolver {
     }
 
     @Override
-    Collection<BintrayPackage> packages(GradlePlugin plugin) {
-        [new SimpleBintrayPackage()]
+    BintrayPackage pkg(GradlePlugin plugin) {
+        new SimpleBintrayPackage()
     }
 
     @Override
-    Collection<BintrayVersion> versions(BintrayPackage bintrayPackage) {
+    Collection<BintrayVersion> versions(String pluginId) {
         [new SimpleBintrayVersion()]
     }
 
     @Override
-    BintrayVersion latestVersion(BintrayPackage bintrayPackage) {
+    BintrayVersion latestVersion(String pluginId) {
         new SimpleBintrayVersion()
     }
 }
