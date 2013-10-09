@@ -11,9 +11,9 @@ public interface BintrayResolver {
 
     Collection<GradlePlugin> plugins();
 
-    Collection<BintrayPackage> packages(GradlePlugin plugin);
+    BintrayPackage pkg(GradlePlugin plugin);
 
-    Collection<BintrayVersion> versions(BintrayPackage bintrayPackage);
+    Collection<BintrayVersion> versions(String pluginId);
 
-    BintrayVersion latestVersion(BintrayPackage bintrayPackage);
+    BintrayVersion latestVersion(String pluginId);
 }
