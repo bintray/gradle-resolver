@@ -21,7 +21,7 @@ class BintrayResolverDemoSpec extends Specification {
         then:
         def plugin = resolvedPlugins.first()
         plugin.id == 'SingalongBlog'
-        plugin.version == '1.0'
+        plugin.versionSelector == '1.0+'
     }
 
     def 'Resolve the package that is associated with a Gradle plugin'() {
@@ -42,25 +42,28 @@ class BintrayResolverDemoSpec extends Specification {
         BintrayResolver resolver = new SimpleBintrayResolver()
 
         when:
-        Collection<BintrayVersion> resolvedVersions = resolver.versions('SingalongBlog')
+        BintrayPackageVersions resolvedVersions = resolver.versions('SingalongBlog')
 
 
         then:
-        def version = resolvedVersions.first()
+        resolvedVersions.owningPackage.name == 'captain-hammer'
+        def version = resolvedVersions.versions.first()
         version.name == '1.0'
         version.uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer/1.0'
     }
 
-    def 'Resolve the latest version of a Gradle plugin'() {
+    def 'Resolve the versions specified by the version selector of a Gradle plugin'() {
         setup:
         BintrayResolver resolver = new SimpleBintrayResolver()
 
         when:
-        BintrayVersion latestVersion = resolver.latestVersion('SingalongBlog')
+        BintrayPackageVersions resolvedVersions = resolver.versions(new SimpleGradlePlugin())
 
         then:
-        latestVersion.name == '1.0'
-        latestVersion.uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer/1.0'
+        resolvedVersions.owningPackage.name == 'captain-hammer'
+        def version = resolvedVersions.versions.first()
+        version.name == '1.0'
+        version.uri.toString() == 'https://bintray.com/joss/singalong-blog/captain-hammer/1.0'
     }
 }
 
@@ -77,13 +80,34 @@ private class SimpleBintrayResolver implements BintrayResolver {
     }
 
     @Override
-    Collection<BintrayVersion> versions(String pluginId) {
-        [new SimpleBintrayVersion()]
+    BintrayPackageVersions versions(String pluginId) {
+        new BintrayPackageVersions() {
+            @Override
+            BintrayPackage getOwningPackage() {
+                new SimpleBintrayPackage()
+            }
+
+            @Override
+            Collection<BintrayVersion> getVersions() {
+                [new SimpleBintrayVersion()]
+            }
+        }
     }
 
     @Override
-    BintrayVersion latestVersion(String pluginId) {
-        new SimpleBintrayVersion()
+    BintrayPackageVersions versions(GradlePlugin plugin) {
+        new BintrayPackageVersions() {
+
+            @Override
+            BintrayPackage getOwningPackage() {
+                new SimpleBintrayPackage()
+            }
+
+            @Override
+            Collection<BintrayVersion> getVersions() {
+                [new SimpleBintrayVersion()]
+            }
+        }
     }
 }
 
@@ -121,7 +145,7 @@ private class SimpleGradlePlugin implements GradlePlugin {
     }
 
     @Override
-    String getVersion() {
-        '1.0'
+    Object getVersionSelector() {
+        '1.0+'
     }
 }

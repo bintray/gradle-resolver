@@ -13,7 +13,7 @@ public interface BintrayResolver {
 
     BintrayPackage pkg(GradlePlugin plugin);
 
-    Collection<BintrayVersion> versions(String pluginId);
+    BintrayPackageVersions versions(String pluginId);
 
-    BintrayVersion latestVersion(String pluginId);
+    BintrayPackageVersions versions(GradlePlugin plugin);
 }

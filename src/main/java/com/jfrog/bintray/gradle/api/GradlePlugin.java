@@ -9,5 +9,5 @@ public interface GradlePlugin {
 
     String getId();
 
-    String getVersion();
+    Object getVersionSelector();
 }
